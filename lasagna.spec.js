@@ -1,5 +1,5 @@
 import { resolve } from 'path';
-import { readFileSync, writeFileSync } from 'fs';
+import { readFileSync } from 'fs';
 const initWabt = require("wabt");
 
 let wasmInstance;
@@ -7,11 +7,8 @@ let wasmInstance;
 const initWasm = async (done) => {
   const wabt = await initWabt();
   const watPath = resolve(__dirname, 'lasagna.wat');
-  const wasmPath = resolve(__dirname, 'lasagna.wasm');
   const {buffer} = wabt.parseWat(watPath, readFileSync(watPath, "utf8")).toBinary({log: true, write_debug_names: true});
-  writeFileSync(wasmPath, new Buffer(buffer));
-  const wasmBuffer = readFileSync(wasmPath);
-  const results = await WebAssembly.instantiate(wasmBuffer, {
+  const results = await WebAssembly.instantiate(new Buffer(buffer), {
     env: {
       memoryBase: 0,
       tableBase: 0,
